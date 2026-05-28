@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARC — Residential Architecture</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --text-light: #f5f5f7;
+            --text-dim: #a1a1a6;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(10, 10, 10, 0.7);
+            --accent-green: #a8b0a0; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--bg-dark); color: var(--text-light); overflow-x: hidden; }
+
+        #video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: #0a0a0a; }
+        #walkthrough-canvas { display: block; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7); }
+
+        #progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: rgba(255, 255, 255, 0.05); z-index: 100; }
+        #progress-bar { width: 0%; height: 100%; background: var(--accent-green); }
+
+        #side-nav { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 99; }
+        .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid transparent; cursor: pointer; transition: all 0.3s ease; pointer-events: auto; }
+        .nav-dot:hover, .nav-dot.active { background: var(--accent-green); transform: scale(1.3); box-shadow: 0 0 8px var(--accent-green); }
+
+        #viewport { position: relative; width: 100vw; height: 100vh; overflow: hidden; z-index: 2; }
+        .scroll-wrapper { display: flex; width: 400vw; height: 100vh; }
+        .scroll-section { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0 8%; pointer-events: none; }
+        .hud-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 40px; max-width: 540px; border-radius: 4px; pointer-events: auto; opacity: 0; }
+
+        .hero-panel { text-align: center; max-width: none; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 1; }
+        .hero-eyebrow { font-size: 0.7rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 20px; }
+        .hero-title { font-family: "Didot", serif; font-size: clamp(3.5rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: 0.35em; text-transform: uppercase; margin-bottom: 20px; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+        .hero-title .hollow { -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6); color: transparent; }
+        .hero-chips { display: flex; gap: 15px; margin-top: 15px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        .chip { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 6px 14px; border-radius: 20px; color: var(--text-dim); }
+        .chip strong { color: #fff; }
+
+        .panel-eyebrow { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 12px; font-weight: 600; }
+        .panel-title { font-size: 1.8rem; font-weight: 400; letter-spacing: 0.05em; margin-bottom: 15px; color: #fff; }
+        .panel-title em { font-family: "Didot", serif; font-style: italic; }
+        .panel-rule { width: 60px; height: 1px; background: rgba(255, 255, 255, 0.15); margin-bottom: 20px; }
+        .panel-body { font-size: 0.95rem; line-height: 1.7; color: var(--text-dim); margin-bottom: 20px; }
+        .panel-body strong { color: #fff; font-weight: 500; }
+        
+        .tech-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .tech-table tr { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+        .tech-table tr:last-child { border-bottom: none; }
+        .tech-table td { padding: 12px 0; font-size: 0.85rem; }
+        .tech-label { color: var(--text-dim); }
+        .tech-value { color: #fff; text-align: right; font-family: monospace; }
+
+        .action-row { display: flex; gap: 15px; margin-top: 30px; }
+        .doc-btn { background: transparent; border: 1px solid var(--accent-green); color: var(--text-light); padding: 12px 24px; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; border-radius: 4px; backdrop-filter: blur(5px); }
+        .doc-btn:hover { background: var(--accent-green); color: var(--bg-dark); }
+
+        #doc-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        #doc-modal.active { opacity: 1; pointer-events: auto; }
+        .modal-close { position: absolute; top: 30px; right: 40px; color: var(--accent-green); font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; border: none; background: transparent; z-index: 1001; }
+        .modal-close:hover { color: #fff; }
+
+        @keyframes cinematicFadeIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        .modal-content { max-width: 90vw; max-height: 90vh; display: none; }
+        .modal-content.active { display: block; animation: cinematicFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .modal-content img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 50px rgba(0,0,0,0.5)); }
+    </style>
+</head>
+<body>
+
+    <div id="video-container">
+        <canvas id="walkthrough-canvas"></canvas>
+    </div>
+    
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <div id="side-nav">
+        <div class="nav-dot active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 1666, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 3333, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 5000, behavior: 'smooth'})"></div>
+    </div>
+
+    <div id="viewport">
+        <div class="scroll-wrapper">
+            <section class="scroll-section" id="sec-hero">
+                <div class="hero-panel" id="hero-panel">
+                    <p class="hero-eyebrow">Residential · Architecture</p>
+                    <h1 class="hero-title">ARC <span class="hollow">HOUSE</span></h1>
+                    <div class="hero-chips">
+                        <span class="chip"><strong>NEW DATA</strong></span>
+                        <span class="chip"><strong>NEW DATA</strong></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="scroll-section" id="sec-manifesto">
+                <div class="hud-panel" id="panel-manifesto">
+                    <p class="panel-eyebrow">01 . Intro</p>
+                    <h2 class="panel-title">Title Here</h2>
+                    <div class="panel-rule"></div>
+                    <p class="panel-body">Your residential text goes here.</p>
+                </div>
+            </section>
+
+            <section class="scroll-section" id="sec-strata">
+                <div class="hud-panel" id="panel-strata">
+                    <p class="panel-eyebrow">02 . Materials</p>
+                    <h2 class="panel-title">Title Here</h2>
+                    <div class="panel-rule"></div>
+                    <p class="panel-body">Your residential text goes here.</p>
+                </div>
+            </section>
+
+            <section class="scroll-section" id="sec-technical">
+                <div class="hud-panel" id="panel-technical">
+                    <p class="panel-eyebrow">03 . Documents</p>
+                    <h2 class="panel-title">Technical Specs</h2>
+                    <div class="panel-rule"></div>
+                    <table class="tech-table">
+                        <tr> <td class="tech-label">Project Identity</td><td class="tech-value">ARC</td> </tr>
+                        <tr> <td class="tech-label">Location</td><td class="tech-value">TBD</td> </tr>
+                    </table>
+                    <div class="action-row">
+                        <button class="doc-btn" onclick="openModal('plan')">Floor Plan</button>
+                        <button class="doc-btn" onclick="openModal('section')">Elevations</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="doc-modal">
+        <button class="modal-close" onclick="closeModal()">Close ✕</button>
+        <div class="modal-content" id="modal-plan">
+            <img src="floor_plan.png" alt="Plan"> 
+        </div>
+        <div class="modal-content" id="modal-section">
+            <img src="elevations.png" alt="Section">
+        </div>
+    </div>
+
+    <script>
+        function openModal(type) {
+            document.getElementById('doc-modal').classList.add('active');
+            document.querySelectorAll('.modal-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`modal-${type}`).classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('doc-modal').classList.remove('active');
+        }
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        const canvas = document.getElementById("walkthrough-canvas");
+        const ctx = canvas.getContext("2d");
+
+        // --- UPDATED FOR ARC PROJECT MATH ---
+        // If your folder genuinely has 1800 files, change this to 1800!
+        const frameCount = 1800; 
+        
+        // Updated to Video2_ and 4-digit padding (0000) based on your screenshot
+        const currentFrame = index => `Video2_${String(index).padStart(4, '0')}.jpg`;
+        // ------------------------------------
+
+        const images = [];
+        let currentFrameIndex = 0;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            render(currentFrameIndex);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        for (let i = 0; i < frameCount; i++) {
+            const img = new Image();
+            images.push(img); 
+
+            setTimeout(() => {
+                img.src = currentFrame(i);
+                if (i === 0) {
+                    img.onload = () => render(0);
+                }
+            }, i * 15); 
+        }
+
+        function render(frameIndex) {
+            const img = images[frameIndex];
+            if (!img || !img.complete) return; 
+
+            const canvasRatio = canvas.width / canvas.height;
+            const imgRatio = img.width / img.height;
+            let drawWidth, drawHeight, drawX, drawY;
+
+            if (canvasRatio > imgRatio) {
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / imgRatio;
+                drawX = 0;
+                drawY = (canvas.height - drawHeight) / 2;
+            } else {
+                drawWidth = canvas.height * imgRatio;
+                drawHeight = canvas.height;
+                drawX = (canvas.width - drawWidth) / 2;
+                drawY = 0;
+            }
+
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+        }
+
+        const wrapper = document.querySelector(".scroll-wrapper");
+        const scrollTween = gsap.to(wrapper, { xPercent: -75, ease: "none" });
+
+        ScrollTrigger.create({
+            trigger: "#viewport",
+            pin: true,
+            start: "top top",
+            end: "+=5000",
+            scrub: 1, 
+            animation: scrollTween, 
+            onUpdate: (self) => {
+                currentFrameIndex = Math.round(self.progress * (frameCount - 1));
+                render(currentFrameIndex);
+
+                document.getElementById("progress-bar").style.width = `${self.progress * 100}%`;
+                const activeIndex = Math.min(Math.floor(self.progress * 4), 3);
+                document.querySelectorAll(".nav-dot").forEach((dot, idx) => {
+                    dot.classList.toggle("active", idx === activeIndex);
+                });
+            }
+        });
+
+        gsap.to("#hero-panel", { opacity: 0, y: -50, scrollTrigger: { trigger: "#sec-hero", containerAnimation: scrollTween, start: "center center", end: "right center", scrub: true } });
+
+        gsap.timeline({ scrollTrigger: { trigger: "#sec-manifesto", containerAnimation: scrollTween, start: "left 80%", end: "right 20%", scrub: true } })
+        .fromTo("#panel-manifesto", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 })
+        .to("#panel-manifesto", { opacity: 1, duration: 1 })
+        .to("#panel-manifesto", { opacity: 0, y: -50, duration: 1 });
+
+        gsap.timeline({ scrollTrigger: { trigger: "#sec-strata", containerAnimation: scrollTween, start: "left 80%", end: "right 20%", scrub: true } })
+        .fromTo("#panel-strata", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 })
+        .to("#panel-strata", { opacity: 1, duration: 1 })
+        .to("#panel-strata", { opacity: 0, y: -50, duration: 1 });
+
+        gsap.timeline({ scrollTrigger: { trigger: "#sec-technical", containerAnimation: scrollTween, start: "left 80%", end: "center center", scrub: true } })
+        .fromTo("#panel-technical", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 });
+
+    </script>
+</body>
+</html>
