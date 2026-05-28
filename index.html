@@ -163,11 +163,8 @@
         const canvas = document.getElementById("walkthrough-canvas");
         const ctx = canvas.getContext("2d");
 
-        // --- UPDATED FOR ARC PROJECT MATH ---
-        // If your folder genuinely has 1800 files, change this to 1800!
-        const frameCount = 1800; 
-        
-        // Updated to Video2_ and 4-digit padding (0000) based on your screenshot
+        // --- MATH LOCKED IN FOR 999 FRAMES ---
+        const frameCount = 999; 
         const currentFrame = index => `Video2_${String(index).padStart(4, '0')}.jpg`;
         // ------------------------------------
 
