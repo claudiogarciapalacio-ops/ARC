@@ -81,15 +81,17 @@
     
     <div id="progress-container"><div id="progress-bar"></div></div>
 
+    <!-- NAV DOTS UPDATED TO MATCH NEW SCROLL LENGTH -->
     <div id="side-nav">
         <div class="nav-dot active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 1666, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 3333, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 5000, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 3000, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 6000, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 9000, behavior: 'smooth'})"></div>
     </div>
 
     <div id="viewport">
         <div class="scroll-wrapper">
+            <!-- PANEL 1 -->
             <section class="scroll-section" id="sec-hero">
                 <div class="hero-panel" id="hero-panel">
                     <p class="hero-eyebrow">Residential · Architecture</p>
@@ -101,6 +103,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 2 -->
             <section class="scroll-section" id="sec-manifesto">
                 <div class="hud-panel" id="panel-manifesto">
                     <p class="panel-eyebrow">01 . Intro</p>
@@ -110,6 +113,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 3 -->
             <section class="scroll-section" id="sec-strata">
                 <div class="hud-panel" id="panel-strata">
                     <p class="panel-eyebrow">02 . Materials</p>
@@ -119,6 +123,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 4 -->
             <section class="scroll-section" id="sec-technical">
                 <div class="hud-panel" id="panel-technical">
                     <p class="panel-eyebrow">03 . Documents</p>
@@ -163,11 +168,8 @@
         const canvas = document.getElementById("walkthrough-canvas");
         const ctx = canvas.getContext("2d");
 
-        // --- MATH LOCKED IN FOR 600 FRAMES ---
-        // Updated to Video2_ and 3-digit padding (000) based on your screenshot
         const frameCount = 600; 
         const currentFrame = index => `Video2_${String(index).padStart(3, '0')}.jpg`;
-        // ------------------------------------
 
         const images = [];
         let currentFrameIndex = 0;
@@ -219,11 +221,12 @@
         const wrapper = document.querySelector(".scroll-wrapper");
         const scrollTween = gsap.to(wrapper, { xPercent: -75, ease: "none" });
 
+        // MASTER TRIGGER UPDATED TO 9000 PIXELS
         ScrollTrigger.create({
             trigger: "#viewport",
             pin: true,
             start: "top top",
-            end: "+=5000",
+            end: "+=9000", // <--- THIS is what slows down the scrolling speed
             scrub: 1, 
             animation: scrollTween, 
             onUpdate: (self) => {
