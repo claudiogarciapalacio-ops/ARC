@@ -163,9 +163,10 @@
         const canvas = document.getElementById("walkthrough-canvas");
         const ctx = canvas.getContext("2d");
 
-        // --- MATH LOCKED IN FOR 999 FRAMES ---
-        const frameCount = 999; 
-        const currentFrame = index => `Video2_${String(index).padStart(4, '0')}.jpg`;
+        // --- MATH LOCKED IN FOR 600 FRAMES ---
+        // Updated to Video2_ and 3-digit padding (000) based on your screenshot
+        const frameCount = 600; 
+        const currentFrame = index => `Video2_${String(index).padStart(3, '0')}.jpg`;
         // ------------------------------------
 
         const images = [];
