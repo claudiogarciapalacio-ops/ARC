@@ -81,12 +81,12 @@
     
     <div id="progress-container"><div id="progress-bar"></div></div>
 
-    <!-- NAV DOTS UPDATED TO MATCH NEW SCROLL LENGTH -->
+    <!-- NAV DOTS RE-MATHED FOR ULTRA-SLOW 18,000 PIXEL SCROLL -->
     <div id="side-nav">
         <div class="nav-dot active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 3000, behavior: 'smooth'})"></div>
         <div class="nav-dot" onclick="window.scrollTo({top: 6000, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 9000, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 12000, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 18000, behavior: 'smooth'})"></div>
     </div>
 
     <div id="viewport">
@@ -221,12 +221,12 @@
         const wrapper = document.querySelector(".scroll-wrapper");
         const scrollTween = gsap.to(wrapper, { xPercent: -75, ease: "none" });
 
-        // MASTER TRIGGER UPDATED TO 9000 PIXELS
+        // MASTER TRIGGER MASSIVELY SLOWED DOWN TO 18000 PIXELS
         ScrollTrigger.create({
             trigger: "#viewport",
             pin: true,
             start: "top top",
-            end: "+=9000", // <--- THIS is what slows down the scrolling speed
+            end: "+=18000", 
             scrub: 1, 
             animation: scrollTween, 
             onUpdate: (self) => {
