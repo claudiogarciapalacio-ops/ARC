@@ -90,7 +90,6 @@
 
     <div id="viewport">
         <div class="scroll-wrapper">
-            <!-- PANEL 1 -->
             <section class="scroll-section" id="sec-hero">
                 <div class="hero-panel" id="hero-panel">
                     <p class="hero-eyebrow">Residential · Architecture</p>
@@ -102,7 +101,6 @@
                 </div>
             </section>
 
-            <!-- PANEL 2 -->
             <section class="scroll-section" id="sec-manifesto">
                 <div class="hud-panel" id="panel-manifesto">
                     <p class="panel-eyebrow">01 . Intro</p>
@@ -112,7 +110,6 @@
                 </div>
             </section>
 
-            <!-- PANEL 3 -->
             <section class="scroll-section" id="sec-strata">
                 <div class="hud-panel" id="panel-strata">
                     <p class="panel-eyebrow">02 . Materials</p>
@@ -122,7 +119,6 @@
                 </div>
             </section>
 
-            <!-- PANEL 4 -->
             <section class="scroll-section" id="sec-technical">
                 <div class="hud-panel" id="panel-technical">
                     <p class="panel-eyebrow">03 . Documents</p>
@@ -220,13 +216,13 @@
         const wrapper = document.querySelector(".scroll-wrapper");
         const scrollTween = gsap.to(wrapper, { xPercent: -75, ease: "none" });
 
-        // MASTER TRIGGER WITH 0.5 GOLDILOCKS SCRUB
+        // MASTER TRIGGER LOCKED IN AT 0.8
         ScrollTrigger.create({
             trigger: "#viewport",
             pin: true,
             start: "top top",
             end: "+=18000", 
-            scrub: 0.5, // <--- THE SWEET SPOT FOR SMOOTHNESS & CRISP STOPPING
+            scrub: 0.8, // <--- THE 0.8 SWEET SPOT
             animation: scrollTween, 
             onUpdate: (self) => {
                 currentFrameIndex = Math.round(self.progress * (frameCount - 1));
