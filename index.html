@@ -32,7 +32,9 @@
         .nav-dot:hover, .nav-dot.active { background: var(--accent-green); transform: scale(1.3); box-shadow: 0 0 8px var(--accent-green); }
 
         #viewport { position: relative; width: 100vw; height: 100vh; overflow: hidden; z-index: 2; }
-        .scroll-wrapper { display: flex; width: 400vw; height: 100vh; }
+        
+        /* UPDATED: Wrapper is now 600vw wide to hold 6 panels */
+        .scroll-wrapper { display: flex; width: 600vw; height: 100vh; }
         .scroll-section { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0 8%; pointer-events: none; }
         .hud-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 40px; max-width: 540px; border-radius: 4px; pointer-events: auto; opacity: 0; }
 
@@ -83,8 +85,10 @@
 
     <div id="side-nav">
         <div class="nav-dot active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 6000, behavior: 'smooth'})"></div>
-        <div class="nav-dot" onclick="window.scrollTo({top: 12000, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 3600, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 7200, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 10800, behavior: 'smooth'})"></div>
+        <div class="nav-dot" onclick="window.scrollTo({top: 14400, behavior: 'smooth'})"></div>
         <div class="nav-dot" onclick="window.scrollTo({top: 18000, behavior: 'smooth'})"></div>
     </div>
 
@@ -119,9 +123,27 @@
                 </div>
             </section>
 
+            <section class="scroll-section" id="sec-flow">
+                <div class="hud-panel" id="panel-flow">
+                    <p class="panel-eyebrow">03 . Spatial Flow</p>
+                    <h2 class="panel-title">Title Here</h2>
+                    <div class="panel-rule"></div>
+                    <p class="panel-body">Your residential text goes here.</p>
+                </div>
+            </section>
+
+            <section class="scroll-section" id="sec-enviro">
+                <div class="hud-panel" id="panel-enviro">
+                    <p class="panel-eyebrow">04 . Environment</p>
+                    <h2 class="panel-title">Title Here</h2>
+                    <div class="panel-rule"></div>
+                    <p class="panel-body">Your residential text goes here.</p>
+                </div>
+            </section>
+
             <section class="scroll-section" id="sec-technical">
                 <div class="hud-panel" id="panel-technical">
-                    <p class="panel-eyebrow">03 . Documents</p>
+                    <p class="panel-eyebrow">05 . Documents</p>
                     <h2 class="panel-title">Technical Specs</h2>
                     <div class="panel-rule"></div>
                     <table class="tech-table">
@@ -214,28 +236,32 @@
         }
 
         const wrapper = document.querySelector(".scroll-wrapper");
-        const scrollTween = gsap.to(wrapper, { xPercent: -75, ease: "none" });
+        
+        // UPDATED: Math changed to pull 6 panels (-83.333%) instead of 4 (-75%)
+        const scrollTween = gsap.to(wrapper, { xPercent: -83.3333, ease: "none" });
 
-        // MASTER TRIGGER LOCKED IN AT 0.8
         ScrollTrigger.create({
             trigger: "#viewport",
             pin: true,
             start: "top top",
             end: "+=18000", 
-            scrub: 0.8, // <--- THE 0.8 SWEET SPOT
+            scrub: 0.8,
             animation: scrollTween, 
             onUpdate: (self) => {
                 currentFrameIndex = Math.round(self.progress * (frameCount - 1));
                 render(currentFrameIndex);
 
                 document.getElementById("progress-bar").style.width = `${self.progress * 100}%`;
-                const activeIndex = Math.min(Math.floor(self.progress * 4), 3);
+                
+                // UPDATED: Dot active math linked to 6 dots
+                const activeIndex = Math.round(self.progress * 5);
                 document.querySelectorAll(".nav-dot").forEach((dot, idx) => {
                     dot.classList.toggle("active", idx === activeIndex);
                 });
             }
         });
 
+        // ANIMATION TIMELINES
         gsap.to("#hero-panel", { opacity: 0, y: -50, scrollTrigger: { trigger: "#sec-hero", containerAnimation: scrollTween, start: "center center", end: "right center", scrub: true } });
 
         gsap.timeline({ scrollTrigger: { trigger: "#sec-manifesto", containerAnimation: scrollTween, start: "left 80%", end: "right 20%", scrub: true } })
@@ -247,6 +273,16 @@
         .fromTo("#panel-strata", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 })
         .to("#panel-strata", { opacity: 1, duration: 1 })
         .to("#panel-strata", { opacity: 0, y: -50, duration: 1 });
+
+        gsap.timeline({ scrollTrigger: { trigger: "#sec-flow", containerAnimation: scrollTween, start: "left 80%", end: "right 20%", scrub: true } })
+        .fromTo("#panel-flow", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 })
+        .to("#panel-flow", { opacity: 1, duration: 1 })
+        .to("#panel-flow", { opacity: 0, y: -50, duration: 1 });
+
+        gsap.timeline({ scrollTrigger: { trigger: "#sec-enviro", containerAnimation: scrollTween, start: "left 80%", end: "right 20%", scrub: true } })
+        .fromTo("#panel-enviro", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 })
+        .to("#panel-enviro", { opacity: 1, duration: 1 })
+        .to("#panel-enviro", { opacity: 0, y: -50, duration: 1 });
 
         gsap.timeline({ scrollTrigger: { trigger: "#sec-technical", containerAnimation: scrollTween, start: "left 80%", end: "center center", scrub: true } })
         .fromTo("#panel-technical", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 });
