@@ -33,7 +33,6 @@
 
         #viewport { position: relative; width: 100vw; height: 100vh; overflow: hidden; z-index: 2; }
         
-        /* UPDATED: Wrapper is now 600vw wide to hold 6 panels */
         .scroll-wrapper { display: flex; width: 600vw; height: 100vh; }
         .scroll-section { width: 100vw; height: 100vh; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0 8%; pointer-events: none; }
         .hud-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 40px; max-width: 540px; border-radius: 4px; pointer-events: auto; opacity: 0; }
@@ -94,6 +93,7 @@
 
     <div id="viewport">
         <div class="scroll-wrapper">
+            <!-- PANEL 1: HERO -->
             <section class="scroll-section" id="sec-hero">
                 <div class="hero-panel" id="hero-panel">
                     <p class="hero-eyebrow">Residential · Architecture</p>
@@ -105,6 +105,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 2: INTRO -->
             <section class="scroll-section" id="sec-manifesto">
                 <div class="hud-panel" id="panel-manifesto">
                     <p class="panel-eyebrow">01 . Intro</p>
@@ -114,6 +115,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 3: MATERIALS -->
             <section class="scroll-section" id="sec-strata">
                 <div class="hud-panel" id="panel-strata">
                     <p class="panel-eyebrow">02 . Materials</p>
@@ -123,6 +125,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 4: NEW SECTION -->
             <section class="scroll-section" id="sec-flow">
                 <div class="hud-panel" id="panel-flow">
                     <p class="panel-eyebrow">03 . Spatial Flow</p>
@@ -132,6 +135,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 5: NEW SECTION -->
             <section class="scroll-section" id="sec-enviro">
                 <div class="hud-panel" id="panel-enviro">
                     <p class="panel-eyebrow">04 . Environment</p>
@@ -141,6 +145,7 @@
                 </div>
             </section>
 
+            <!-- PANEL 6: DOCUMENTS -->
             <section class="scroll-section" id="sec-technical">
                 <div class="hud-panel" id="panel-technical">
                     <p class="panel-eyebrow">05 . Documents</p>
@@ -236,16 +241,15 @@
         }
 
         const wrapper = document.querySelector(".scroll-wrapper");
-        
-        // UPDATED: Math changed to pull 6 panels (-83.333%) instead of 4 (-75%)
         const scrollTween = gsap.to(wrapper, { xPercent: -83.3333, ease: "none" });
 
+        // MASTER TRIGGER LOCKED IN AT 1.0 SCRUB
         ScrollTrigger.create({
             trigger: "#viewport",
             pin: true,
             start: "top top",
             end: "+=18000", 
-            scrub: 0.8,
+            scrub: 1.0, // <--- CHANGED TO 1.0
             animation: scrollTween, 
             onUpdate: (self) => {
                 currentFrameIndex = Math.round(self.progress * (frameCount - 1));
@@ -253,7 +257,6 @@
 
                 document.getElementById("progress-bar").style.width = `${self.progress * 100}%`;
                 
-                // UPDATED: Dot active math linked to 6 dots
                 const activeIndex = Math.round(self.progress * 5);
                 document.querySelectorAll(".nav-dot").forEach((dot, idx) => {
                     dot.classList.toggle("active", idx === activeIndex);
