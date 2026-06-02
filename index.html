@@ -81,7 +81,6 @@
     
     <div id="progress-container"><div id="progress-bar"></div></div>
 
-    <!-- NAV DOTS RE-MATHED FOR ULTRA-SLOW 18,000 PIXEL SCROLL -->
     <div id="side-nav">
         <div class="nav-dot active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"></div>
         <div class="nav-dot" onclick="window.scrollTo({top: 6000, behavior: 'smooth'})"></div>
@@ -168,7 +167,6 @@
         const canvas = document.getElementById("walkthrough-canvas");
         const ctx = canvas.getContext("2d");
 
-        // --- MATH LOCKED IN FOR 600 FRAMES ---
         const frameCount = 600; 
         const currentFrame = index => `Video2_${String(index).padStart(3, '0')}.jpg`;
 
@@ -222,13 +220,13 @@
         const wrapper = document.querySelector(".scroll-wrapper");
         const scrollTween = gsap.to(wrapper, { xPercent: -75, ease: "none" });
 
-        // MASTER TRIGGER MASSIVELY SLOWED DOWN WITH CRISP STOPPING
+        // MASTER TRIGGER WITH 0.5 GOLDILOCKS SCRUB
         ScrollTrigger.create({
             trigger: "#viewport",
             pin: true,
             start: "top top",
             end: "+=18000", 
-            scrub: 0.1, // CRISP STOP ACTIVATED
+            scrub: 0.5, // <--- THE SWEET SPOT FOR SMOOTHNESS & CRISP STOPPING
             animation: scrollTween, 
             onUpdate: (self) => {
                 currentFrameIndex = Math.round(self.progress * (frameCount - 1));
